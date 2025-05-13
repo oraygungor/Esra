@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Türkçe Wordle Çözücü</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Türkçe Wordle Çözücü</h1>
+
+        <!-- Başlangıç Ekranı -->
+        <div id="initial-screen">
+            <h2>Kelime Uzunluğunu Seçin:</h2>
+            <div class="length-options-container"> 
+                <div id="length-options-row1" class="length-options-row">
+                    <!-- JS ile doldurulacak -->
+                </div>
+                <!-- İleride gerekirse daha fazla satır eklenebilir, örn:
+                <div id="length-options-row2" class="length-options-row"></div>
+                -->
+            </div>
+            <button id="start-button">Başla</button>
+            <p id="loading-message" style="display:none;">Kelime listesi yükleniyor...</p>
+        </div>
+
+        <!-- Çözücü Ekranı (Başlangıçta Gizli) -->
+        <div id="solver-screen" style="display:none;">
+            <div class="input-area">
+                <div class="form-group">
+                    <label for="guess-input">Tahmin:</label>
+                    <input type="text" id="guess-input"> 
+                </div>
+                <div class="form-group">
+                    <label>Sonuç (Harflere Tıkla):</label>
+                    <div id="result-boxes" class="result-boxes">
+                        <!-- JS ile dinamik olarak oluşturulacak -->
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button id="filter-button">Filtrele ve Öner</button>
+                    <button id="reset-button">Sıfırla (Bu Oyunu)</button>
+                    <button id="new-game-button">Yeni Oyun (Uzunluk Seç)</button>
+                </div>
+            </div>
+
+            <div class="suggestions-area">
+                <h2>Öneriler:</h2>
+                <div id="status-message">Kalan olası kelime: 0</div>
+                <ul id="suggestion-list">
+                    <!-- JS ile dinamik olarak doldurulacak -->
+                </ul>
+                <div id="show-all-suggestions" class="show-all-link" style="display:none;">
+                    >>> ... ve X tane daha (Tıkla göster)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
