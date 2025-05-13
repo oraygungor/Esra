@@ -3,410 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wordle Çözücü (Web)</title>
-    <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 20px; background-color: #f4f4f4; }
-        .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 90%; max-width: 500px; }
-        h1, h2 { text-align: center; color: #333; }
-        #initial-screen { display: flex; flex-direction: column; align-items: center; }
-        #initial-screen .radio-group label { margin-right: 10px; }
-        #initial-screen button { margin-top: 15px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-        #solver-screen { display: none; flex-direction: column; align-items: center; }
-        .input-area, .controls, .suggestions, .status { margin-bottom: 15px; width: 100%; }
-        .input-row { display: flex; align-items: center; margin-bottom: 10px; justify-content: center; }
-        .input-row label { margin-right: 10px; min-width: 60px; }
-        #guess-input { padding: 8px; font-size: 1.2em; text-align: center; text-transform: uppercase; border: 1px solid #ccc; border-radius: 4px; letter-spacing: 2px; }
-        #result-squares { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
-        .result-square { width: 40px; height: 40px; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; font-size: 1.5em; font-weight: bold; cursor: pointer; user-select: none; border-radius: 4px; transition: background-color 0.2s, color 0.2s; }
-        .result-square.gray { background-color: #787c7e; color: white; }
-        .result-square.yellow { background-color: #c9b458; color: white; }
-        .result-square.green { background-color: #6aaa64; color: white; }
-        .controls button { padding: 10px 15px; margin: 5px; font-size: 1em; cursor: pointer; border: 1px solid #ddd; background-color: #e7e7e7; border-radius: 4px; }
-        .controls button:hover { background-color: #d7d7d7; }
-        .controls button:disabled { background-color: #f0f0f0; color: #aaa; cursor: not-allowed; }
-        #suggestions-list { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px; }
-        #suggestions-list li { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; text-transform: uppercase; }
-        #suggestions-list li:last-child { border-bottom: none; }
-        #suggestions-list li:hover { background-color: #f9f9f9; }
-        #status-message { text-align: center; color: navy; font-style: italic; min-height: 1.2em; }
-    </style>
+    <title>Türkçe Wordle Çözücü</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>Türkçe Wordle Çözücü</h1>
 
+        <!-- Başlangıç Ekranı -->
         <div id="initial-screen">
-            <h2>Kelime Uzunluğunu Seçin</h2>
-            <div class="radio-group">
-                <label><input type="radio" name="wordLength" value="4"> 4</label>
-                <label><input type="radio" name="wordLength" value="5" checked> 5</label>
-                <label><input type="radio" name="wordLength" value="6"> 6</label>
-                <label><input type="radio" name="wordLength" value="7"> 7</label>
-                <label><input type="radio" name="wordLength" value="8"> 8</label>
-                <label><input type="radio" name="wordLength" value="9"> 9</label>
+            <h2>Kelime Uzunluğunu Seçin:</h2>
+            <div class="length-options-container"> 
+                <div id="length-options-row1" class="length-options-row">
+                    <!-- JS ile doldurulacak -->
+                </div>
+                <!-- İleride gerekirse daha fazla satır eklenebilir, örn:
+                <div id="length-options-row2" class="length-options-row"></div>
+                -->
             </div>
-            <button id="start-game-btn">Oyuna Başla</button>
+            <button id="start-button">Başla</button>
+            <p id="loading-message" style="display:none;">Kelime listesi yükleniyor...</p>
         </div>
 
-        <div id="solver-screen">
-            <h2 id="solver-title">X Harfli Çözücü</h2>
+        <!-- Çözücü Ekranı (Başlangıçta Gizli) -->
+        <div id="solver-screen" style="display:none;">
             <div class="input-area">
-                <div class="input-row">
+                <div class="form-group">
                     <label for="guess-input">Tahmin:</label>
-                    <input type="text" id="guess-input" maxlength="5">
+                    <input type="text" id="guess-input"> 
                 </div>
-                <div class="input-row">
-                    <label>Sonuç:</label>
-                    <div id="result-squares"></div>
+                <div class="form-group">
+                    <label>Sonuç (Harflere Tıkla):</label>
+                    <div id="result-boxes" class="result-boxes">
+                        <!-- JS ile dinamik olarak oluşturulacak -->
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button id="filter-button">Filtrele ve Öner</button>
+                    <button id="reset-button">Sıfırla (Bu Oyunu)</button>
+                    <button id="new-game-button">Yeni Oyun (Uzunluk Seç)</button>
                 </div>
             </div>
-            <div class="controls">
-                <button id="filter-btn">Filtrele ve Öner</button>
-                <button id="reset-btn">Sıfırla</button>
-                <button id="new-game-btn">Yeni Oyun (Uzunluk Seç)</button>
-            </div>
-            <div class="suggestions">
-                <h3>Öneriler:</h3>
-                <ul id="suggestions-list"></ul>
-            </div>
-            <div class="status">
-                <p id="status-message">Kelime uzunluğunu seçerek başlayın.</p>
+
+            <div class="suggestions-area">
+                <h2>Öneriler:</h2>
+                <div id="status-message">Kalan olası kelime: 0</div>
+                <ul id="suggestion-list">
+                    <!-- JS ile dinamik olarak doldurulacak -->
+                </ul>
+                <div id="show-all-suggestions" class="show-all-link" style="display:none;">
+                    >>> ... ve X tane daha (Tıkla göster)
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        console.log("Script başlatılıyor..."); // Script'in başladığını kontrol et
-
-        const SUGGESTION_COUNT = 5;
-        const VALID_LENGTHS = [4, 5, 6, 7, 8, 9];
-        const WORD_LIST_FILENAME = "sozluk.txt";
-
-        let currentWordLength = 5;
-        let masterWordList = [];
-        let allWordsCurrentLength = [];
-        let possibleWords = [];
-        let isFirstGuess = true;
-        let bestStarters = [];
-
-        const LETTER_FREQUENCIES = {
-            4: Array.from(turkishLower("AETKILRS")),
-            5: Array.from(turkishLower("AEIKRLMTNS")),
-            6: Array.from(turkishLower("AEIKLRTMNİ")),
-            7: Array.from(turkishLower("AEILKMRİTN")),
-            8: Array.from(turkishLower("AEKLİMRTİN")),
-            9: Array.from(turkishLower("AEKLINRMSTİ"))
-        };
-        const TOP_LETTERS_BY_LENGTH = {};
-        for (const len in LETTER_FREQUENCIES) {
-            TOP_LETTERS_BY_LENGTH[len] = new Set(LETTER_FREQUENCIES[len]);
-        }
-
-        const colorCycle = ['gray', 'yellow', 'green'];
-        const colorMapToChar = {'gray': 'G', 'yellow': 'S', 'green': 'Y'};
-
-        // DOM Elementlerini script başında yakala
-        const initialScreen = document.getElementById('initial-screen');
-        const solverScreen = document.getElementById('solver-screen');
-        const startGameBtn = document.getElementById('start-game-btn');
-        const solverTitle = document.getElementById('solver-title');
-        const guessInput = document.getElementById('guess-input');
-        const resultSquaresContainer = document.getElementById('result-squares');
-        const filterBtn = document.getElementById('filter-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const newGameBtn = document.getElementById('new-game-btn');
-        const suggestionsList = document.getElementById('suggestions-list');
-        const statusMessage = document.getElementById('status-message');
-
-        // DOM elementlerinin yakalandığını kontrol et
-        console.log("DOM Elemanları:", { initialScreen, solverScreen, startGameBtn, statusMessage });
-
-
-        function turkishLower(s) {
-            if (!s) return "";
-            return s.replace(/İ/g, 'i').replace(/I/g, 'ı').toLowerCase();
-        }
-
-        async function loadMasterWordList() {
-            console.log("loadMasterWordList çağrıldı."); // Fonksiyonun çağrıldığını kontrol et
-            if (startGameBtn) {
-                console.log("Oyuna Başla butonu pasif yapılıyor.");
-                startGameBtn.disabled = true;
-            } else {
-                console.error("startGameBtn DOM elementi bulunamadı (loadMasterWordList içinde)!");
-            }
-            if (statusMessage) {
-                statusMessage.textContent = `Kelime listesi (${WORD_LIST_FILENAME}) yükleniyor...`;
-            } else {
-                console.error("statusMessage DOM elementi bulunamadı (loadMasterWordList içinde)!");
-            }
-
-
-            try {
-                console.log(`Fetch işlemi başlıyor: ${WORD_LIST_FILENAME}`);
-                const response = await fetch(WORD_LIST_FILENAME);
-                console.log("Fetch yanıtı alındı, status:", response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} - Dosya: ${WORD_LIST_FILENAME}`);
-                }
-                const text = await response.text();
-                console.log("Dosya içeriği (ilk 100 karakter):", text.substring(0, 100));
-
-                masterWordList = text.split(/\r?\n/)
-                                     .map(word => turkishLower(word.trim()))
-                                     .filter(word => {
-                                         const len = word.length;
-                                         const isValidChar = /^[a-zçğıöşü]+$/i.test(word.replace(/[ıi]/g, 'i'));
-                                         const isValidLength = VALID_LENGTHS.includes(len);
-                                         // Gerekirse burada da loglama yapabilirsiniz:
-                                         // if (isValidLength && !isValidChar) console.warn("Filtrelendi (geçersiz karakter):", word);
-                                         // if (!isValidLength && word.length > 0) console.warn("Filtrelendi (yanlış uzunluk):", word);
-                                         return isValidChar && isValidLength;
-                                     });
-
-                console.log("masterWordList oluşturuldu, uzunluk:", masterWordList.length);
-
-                if (masterWordList.length > 0) {
-                    if (statusMessage) statusMessage.textContent = `${masterWordList.length} kelime yüklendi. Başlamak için uzunluk seçin.`;
-                    if (startGameBtn) {
-                        console.log("Oyuna Başla butonu aktif yapılıyor.");
-                        startGameBtn.disabled = false;
-                    } else {
-                         console.error("startGameBtn DOM elementi bulunamadı (yükleme sonrası)!");
-                    }
-                } else {
-                    console.warn("masterWordList boş veya geçerli kelime bulunamadı.");
-                    if (statusMessage) statusMessage.textContent = `Kelime listesi (${WORD_LIST_FILENAME}) boş veya geçerli kelime içermiyor.`;
-                    // Buton pasif kalmalı
-                }
-            } catch (error) {
-                console.error("Kelime listesi yüklenirken KAPSAMLI HATA:", error);
-                if (statusMessage) statusMessage.textContent = `Hata: ${WORD_LIST_FILENAME} yüklenemedi. Detaylar için konsolu (F12) kontrol edin.`;
-                masterWordList = [];
-                if (startGameBtn) startGameBtn.disabled = true;
-            }
-        }
-
-        // (validateInput, filterWords, calculateStartScore, findBestStartingWords, vb. fonksiyonlar önceki gibi)
-        function validateInput(guess, resultString, wordLength) {
-            const guessLower = turkishLower(guess);
-            if (guess.length !== wordLength) { return { isValid: false, message: `Tahmin tam olarak ${wordLength} harf olmalıdır.` }; }
-            if (!/^[a-zçğıöşü]+$/i.test(guessLower.replace(/[ıi]/g, 'i'))) { return { isValid: false, message: "Tahmin sadece geçerli harf içermelidir." };}
-            if (resultString.length !== wordLength) { return { isValid: false, message: `Sonuç ${wordLength} karakterli olmalı.` }; }
-            return { isValid: true, message: "" };
-        }
-        function filterWords(possible, guess, resultColors, wordLength) {
-            const guessLower = turkishLower(guess);
-            const newPossibleWords = [];
-            const minCounts = {}; const exactCounts = {};
-            for (let i = 0; i < wordLength; i++) {
-                const letter = guessLower[i]; const color = resultColors[i];
-                if (color === 'green' || color === 'yellow') { minCounts[letter] = (minCounts[letter] || 0) + 1; }
-            }
-            for (let i = 0; i < wordLength; i++) {
-                const letter = guessLower[i]; const color = resultColors[i];
-                if (color === 'gray') {
-                    if (!minCounts[letter]) { exactCounts[letter] = 0; }
-                    else { exactCounts[letter] = minCounts[letter]; }
-                }
-            }
-            for (const word of possible) {
-                const currentWordLower = turkishLower(word); let isValid = true;
-                const currentWordCounts = {};
-                for(const char of currentWordLower) { currentWordCounts[char] = (currentWordCounts[char] || 0) + 1; }
-                for (let i = 0; i < wordLength; i++) { if (resultColors[i] === 'green' && currentWordLower[i] !== guessLower[i]) { isValid = false; break; } }
-                if (!isValid) continue;
-                for (let i = 0; i < wordLength; i++) { if (resultColors[i] === 'yellow') { if (!currentWordLower.includes(guessLower[i]) || currentWordLower[i] === guessLower[i]) { isValid = false; break; } } }
-                if (!isValid) continue;
-                for (const letter in minCounts) { if ((currentWordCounts[letter] || 0) < minCounts[letter]) { isValid = false; break; } }
-                if (!isValid) continue;
-                for (const letter in exactCounts) { if ((currentWordCounts[letter] || 0) !== exactCounts[letter]) { isValid = false; break; } }
-                if (!isValid) continue;
-                for (let i = 0; i < wordLength; i++) { if (resultColors[i] === 'gray' && currentWordLower[i] === guessLower[i]) { isValid = false; break; } }
-                if (!isValid) continue;
-                if (isValid) { newPossibleWords.push(word); }
-            }
-            return newPossibleWords;
-        }
-        function calculateStartScore(word, topLettersSet, wordLength) {
-            const wordLower = turkishLower(word); const wordSet = new Set(wordLower.split(''));
-            let uniqueLetterBonus = (wordSet.size === wordLength) ? 150 : wordSet.size * Math.floor(150 / wordLength);
-            let frequencyScore = 0; let allTopBonus = 0; let topLettersInWordCount = 0;
-            if (topLettersSet) {
-                wordSet.forEach(letter => { if (topLettersSet.has(letter)) { topLettersInWordCount++; } });
-                frequencyScore = topLettersInWordCount * 25;
-                if (Array.from(wordSet).every(letter => topLettersSet.has(letter))) { allTopBonus = 15; }
-            }
-            return uniqueLetterBonus + frequencyScore + allTopBonus;
-        }
-        function findBestStartingWords(words, topLettersSet, count, wordLength) {
-            if (!words || words.length === 0) return [];
-            const scoredWordsData = words.map(word => ({
-                word: word,
-                score: calculateStartScore(word, topLettersSet, wordLength)
-            }));
-            scoredWordsData.sort((a, b) => b.score - a.score || a.word.localeCompare(b.word, 'tr'));
-            return scoredWordsData.slice(0, count).map(item => item.word);
-        }
-        function createResultSquares(length) {
-            resultSquaresContainer.innerHTML = '';
-            for (let i = 0; i < length; i++) {
-                const square = document.createElement('div');
-                square.classList.add('result-square', 'gray');
-                square.dataset.index = i; square.textContent = '?'; square.dataset.color = 'gray';
-                square.addEventListener('click', () => {
-                    const currentColor = square.dataset.color;
-                    const currentIndex = colorCycle.indexOf(currentColor);
-                    const nextColor = colorCycle[(currentIndex + 1) % colorCycle.length];
-                    square.className = 'result-square ' + nextColor; square.dataset.color = nextColor;
-                });
-                resultSquaresContainer.appendChild(square);
-            }
-        }
-        function updateResultLabelTexts(guessStr) {
-            const squares = resultSquaresContainer.children;
-            for (let i = 0; i < currentWordLength; i++) { if (squares[i]) { squares[i].textContent = (i < guessStr.length) ? guessStr[i].toUpperCase() : '?'; } }
-        }
-        function resetResultSquares() {
-            const squares = resultSquaresContainer.children;
-            for (let i = 0; i < currentWordLength; i++) { if (squares[i]) { squares[i].className = 'result-square gray'; squares[i].dataset.color = 'gray'; } }
-            updateResultLabelTexts(guessInput.value);
-        }
-        function setResultSquaresToYYYYY() {
-             const squares = resultSquaresContainer.children;
-             for (let i = 0; i < currentWordLength; i++) { if (squares[i]) { squares[i].className = 'result-square green'; squares[i].dataset.color = 'green'; } }
-        }
-        function updateSuggestionsList() {
-            suggestionsList.innerHTML = ''; let suggestionsToShow = [];
-            if (isFirstGuess) {
-                suggestionsToShow = bestStarters;
-                if (suggestionsToShow.length > 0) { const titleLi = document.createElement('li'); titleLi.textContent = "--- Başlangıç Önerileri ---"; titleLi.style.fontWeight = 'bold'; titleLi.style.backgroundColor = '#f0f0f0'; suggestionsList.appendChild(titleLi); }
-            } else { suggestionsToShow = possibleWords.slice(0, SUGGESTION_COUNT); }
-            if (suggestionsToShow.length === 0 && possibleWords.length > 0 && !isFirstGuess) { suggestionsToShow = possibleWords.slice(0, possibleWords.length); }
-            if (possibleWords.length === 0 && !isFirstGuess) { const li = document.createElement('li'); li.textContent = "(Olası kelime kalmadı)"; suggestionsList.appendChild(li); }
-            else if (suggestionsToShow.length === 0 && isFirstGuess) { const li = document.createElement('li'); li.textContent = "(Başlangıç önerisi hesaplanamadı veya kelime listesi boş/uygun değil)"; suggestionsList.appendChild(li); }
-            else {
-                suggestionsToShow.forEach(word => { const li = document.createElement('li'); li.textContent = word.toUpperCase(); li.addEventListener('click', () => { guessInput.value = word.toUpperCase(); updateResultLabelTexts(word); }); suggestionsList.appendChild(li); });
-                if (isFirstGuess && allWordsCurrentLength.length > suggestionsToShow.length) {
-                     const separatorLi = document.createElement('li'); separatorLi.textContent = `--- Diğer Olasılıklar (${allWordsCurrentLength.length}) ---`; separatorLi.style.fontWeight = 'bold'; separatorLi.style.backgroundColor = '#f0f0f0'; suggestionsList.appendChild(separatorLi);
-                     const otherSuggestions = allWordsCurrentLength.filter(w => !suggestionsToShow.includes(w)).slice(0, 10);
-                     otherSuggestions.forEach(word => { const li = document.createElement('li'); li.textContent = word.toUpperCase(); li.addEventListener('click', () => { guessInput.value = word.toUpperCase(); updateResultLabelTexts(word); }); suggestionsList.appendChild(li); });
-                } else if (!isFirstGuess && possibleWords.length > suggestionsToShow.length) { const li = document.createElement('li'); li.textContent = `... ve ${possibleWords.length - suggestionsToShow.length} tane daha`; suggestionsList.appendChild(li); }
-            }
-        }
-        function updateStatusMessage() {
-            let count = possibleWords.length; let msg = `Kalan olası kelime: ${count}`;
-            if (isFirstGuess) { msg += " | İyi başlangıçlar öneriliyor."; }
-            else if (count === 0) { msg = "Eşleşen kelime bulunamadı!"; }
-            else if (count === 1 && !isFirstGuess) { if (filterBtn.disabled) { msg = `Kelime bulundu: ${possibleWords[0].toUpperCase()}`; } else { msg = `Sonraki tahmin: ${possibleWords[0].toUpperCase()}`; } }
-            if (statusMessage) statusMessage.textContent = msg; else console.error("updateStatusMessage: statusMessage DOM elementi bulunamadı!");
-        }
-
-        function setupNewGame(length) {
-            currentWordLength = length;
-            if (solverTitle) solverTitle.textContent = `${length} Harfli Çözücü`; else console.error("setupNewGame: solverTitle DOM elementi bulunamadı!");
-            if (guessInput) { guessInput.maxLength = length; guessInput.value = '';} else console.error("setupNewGame: guessInput DOM elementi bulunamadı!");
-            if (filterBtn) filterBtn.disabled = false; else console.error("setupNewGame: filterBtn DOM elementi bulunamadı!");
-
-            allWordsCurrentLength = masterWordList.filter(word => word.length === length);
-            if (allWordsCurrentLength.length === 0) {
-                if (statusMessage) statusMessage.textContent = `Bu uzunlukta (${length}) kelime bulunamadı. Lütfen kelime listenizi kontrol edin veya farklı bir uzunluk seçin.`;
-                console.log(`setupNewGame: ${length} uzunluğunda kelime bulunamadı.`);
-                possibleWords = []; bestStarters = [];
-                if (resultSquaresContainer) resultSquaresContainer.innerHTML = '';
-                if (suggestionsList) updateSuggestionsList();
-                return false;
-            }
-            possibleWords = [...allWordsCurrentLength]; isFirstGuess = true;
-            const topLettersSet = TOP_LETTERS_BY_LENGTH[length] || new Set();
-            bestStarters = findBestStartingWords(allWordsCurrentLength, topLettersSet, SUGGESTION_COUNT, length);
-            console.log(`${length} harfli en iyi başlangıç önerileri (Frekansa Göre):`, bestStarters);
-            createResultSquares(length); updateSuggestionsList(); updateStatusMessage();
-            return true;
-        }
-        function handleFilter() {
-            const guess = guessInput.value.toUpperCase(); const resultColors = [];
-            const squares = resultSquaresContainer.children;
-            for (let i = 0; i < currentWordLength; i++) { resultColors.push(squares[i].dataset.color || 'gray'); }
-            const resultString = resultColors.map(color => colorMapToChar[color]).join('');
-            const validation = validateInput(guess, resultString, currentWordLength);
-            if (!validation.isValid) { alert("Geçersiz Girdi: " + validation.message); guessInput.focus(); return; }
-            if (resultString === 'Y'.repeat(currentWordLength)) {
-                alert(`Tebrikler! Kelimeyi buldunuz: ${guess}`); possibleWords = [turkishLower(guess)]; isFirstGuess = false;
-                updateStatusMessage(); updateSuggestionsList(); filterBtn.disabled = true; return;
-            }
-            const initialCount = possibleWords.length;
-            possibleWords = filterWords(possibleWords, guess, resultColors, currentWordLength);
-            isFirstGuess = false; updateStatusMessage(); updateSuggestionsList(); resetResultSquares();
-            guessInput.focus(); guessInput.select();
-            if (possibleWords.length === 0) { alert("Girdiğiniz bilgilere uyan olası kelime kalmadı..."); filterBtn.disabled = true; }
-            else if (possibleWords.length === 1 && initialCount > 1) {
-                const foundWord = possibleWords[0].toUpperCase(); alert(`Kalan tek olasılık: ${foundWord}`);
-                guessInput.value = foundWord; updateResultLabelTexts(foundWord); setResultSquaresToYYYYY(); filterBtn.disabled = true;
-            }
-        }
-        function handleResetGame() {
-            if (allWordsCurrentLength.length === 0) { alert("Sıfırlanacak aktif oyun yok..."); return; }
-            guessInput.value = ''; possibleWords = [...allWordsCurrentLength]; isFirstGuess = true;
-            resetResultSquares(); updateSuggestionsList(); updateStatusMessage();
-            filterBtn.disabled = false; guessInput.focus();
-            console.log(`${currentWordLength} harfli oyun sıfırlandı.`);
-        }
-        function handleNewGameSelection() {
-            if (solverScreen) solverScreen.style.display = 'none';
-            if (initialScreen) initialScreen.style.display = 'flex';
-            if (guessInput) guessInput.value = '';
-            if (resultSquaresContainer) resultSquaresContainer.innerHTML = '';
-            if (suggestionsList) suggestionsList.innerHTML = '';
-            if (statusMessage) {
-                if (masterWordList.length > 0) {
-                    statusMessage.textContent = `${masterWordList.length} kelime yüklü. Başlamak için uzunluk seçin.`;
-                } else {
-                    statusMessage.textContent = `Kelime listesi (${WORD_LIST_FILENAME}) yükleniyor veya yüklenemedi...`;
-                }
-            }
-            allWordsCurrentLength = []; possibleWords = []; isFirstGuess = true;
-        }
-
-        startGameBtn.addEventListener('click', () => {
-            console.log("Oyuna Başla butonuna tıklandı. masterWordList uzunluğu:", masterWordList.length); // Buton tıklama logu
-            if (masterWordList.length === 0) {
-                alert(`Kelime listesi (${WORD_LIST_FILENAME}) henüz yüklenmedi veya yüklenirken bir hata oluştu. Lütfen sayfanın yüklenmesini veya hatanın giderilmesini bekleyin.`);
-                return;
-            }
-            const selectedRadio = document.querySelector('input[name="wordLength"]:checked');
-            if (selectedRadio) {
-                const length = parseInt(selectedRadio.value);
-                console.log(`Seçilen uzunluk: ${length}. setupNewGame çağrılıyor.`);
-                if (setupNewGame(length)) {
-                    console.log("setupNewGame başarılı, ekran değiştiriliyor.");
-                    if (initialScreen) initialScreen.style.display = 'none';
-                    if (solverScreen) solverScreen.style.display = 'flex';
-                } else {
-                    console.log("setupNewGame başarısız oldu (örn: o uzunlukta kelime yok).");
-                }
-            } else { alert("Lütfen bir kelime uzunluğu seçin."); }
-        });
-
-        guessInput.addEventListener('input', (event) => {
-            let value = event.target.value.toUpperCase(); value = value.replace(/[^A-ZÇĞIİÖŞÜ]/g, '');
-            event.target.value = value; updateResultLabelTexts(value);
-        });
-        guessInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') { handleFilter(); } });
-
-        filterBtn.addEventListener('click', handleFilter);
-        resetBtn.addEventListener('click', handleResetGame);
-        newGameBtn.addEventListener('click', handleNewGameSelection);
-
-        // --- Uygulamayı Başlat ---
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded olayı tetiklendi."); // DOM yüklenme logu
-            if (solverScreen) solverScreen.style.display = 'none';
-            if (initialScreen) initialScreen.style.display = 'flex';
-            // Kelime listesini sayfa yüklendiğinde çek
-            loadMasterWordList();
-        });
-
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

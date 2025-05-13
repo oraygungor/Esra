@@ -1,0 +1,226 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 700px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
+
+/* Başlangıç Ekranı */
+.length-options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.length-options-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+.length-options-row label {
+    cursor: pointer;
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.2s ease-in-out;
+}
+.length-options-row label:hover {
+    background-color: #f0f0f0;
+}
+.length-options-row input[type="radio"] {
+    margin-right: 5px;
+}
+
+
+#start-button {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+#start-button:hover {
+    background-color: #4cae4c;
+}
+#start-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#loading-message {
+    text-align: center;
+    color: #777;
+}
+
+
+/* Çözücü Ekranı */
+.input-area, .suggestions-area {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#guess-input {
+    width: 100%; /* calc(100% - 22px) yerine %100 ve box-sizing */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    /* Font boyutu JS ile ayarlanacak */
+    text-align: center;
+    text-transform: uppercase;
+    box-sizing: border-box; 
+    letter-spacing: 0.1em; /* Harfler arası boşluk */
+}
+
+.result-boxes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; /* Kutuların alta kaymasını engelle, sığmazsa taşsın */
+    gap: 4px;
+    overflow-x: auto; /* Yatayda kaydırma, eğer kutular sığmazsa */
+    padding-bottom: 5px; /* Kaydırma çubuğu için boşluk */
+}
+
+.result-box {
+    min-width: 30px;
+    height: 40px;
+    flex-shrink: 0; /* Kutuların küçülmesini engelle */
+    /* flex-grow: 1;  Kaldırıldı, sabit genişlik daha iyi olabilir */
+    /* flex-basis: 0; Kaldırıldı */
+    /* max-width: 45px; Kaldırıldı */
+    width: auto; /* İçeriğe göre genişlik, padding ile ayarlanacak */
+    padding: 0 5px; /* Harfin sığması için yan boşluklar */
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    /* Font boyutu JS ile ayarlanacak */
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.grey { background-color: #787c7e; color: white; }
+.yellow { background-color: #c9b458; color: white; }
+.green { background-color: #6aaa64; color: white; }
+
+
+.button-group {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    flex-grow: 1;
+    min-width: 120px;
+    transition: background-color 0.2s ease-in-out;
+}
+.button-group button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#filter-button { background-color: #007bff; color: white; }
+#filter-button:hover:not(:disabled) { background-color: #0056b3; }
+#reset-button, #new-game-button { background-color: #6c757d; color: white; }
+#reset-button:hover:not(:disabled), 
+#new-game-button:hover:not(:disabled) { background-color: #5a6268; }
+
+
+#status-message {
+    text-align: center;
+    margin-bottom: 10px;
+    font-style: italic;
+    color: navy;
+    min-height: 1.2em; /* Boşken bile yer kaplasın */
+}
+
+#suggestion-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+#suggestion-list li {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.2s ease-in-out;
+}
+#suggestion-list li:last-child {
+    border-bottom: none;
+}
+#suggestion-list li:hover:not(.title) {
+    background-color: #f0f0f0;
+}
+#suggestion-list li.title {
+    font-weight: bold;
+    background-color: #e9ecef;
+    cursor: default;
+    color: #495057;
+}
+
+.show-all-link {
+    text-align: center;
+    margin-top: 10px;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: none; /* Alt çizgiyi kaldır, hover'da ekle */
+}
+.show-all-link:hover {
+    text-decoration: underline;
+}
